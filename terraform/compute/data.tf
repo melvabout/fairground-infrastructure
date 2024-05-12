@@ -10,14 +10,6 @@ data "aws_iam_policy_document" "server" {
     actions = ["sts:AssumeRole"]
   }
 
-#   statement {
-#     effect = "Allow"
-
-#     actions = ["ec2:DescribeImages"]
-
-#     resources = ["*"]
-#   }
-
 }
 
 data "aws_iam_policy_document" "server_policy" {
