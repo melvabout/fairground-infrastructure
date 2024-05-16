@@ -31,7 +31,7 @@ resource "aws_launch_template" "server" {
 
   image_id = var.server_image_id
   instance_type = "t2.micro"
-  user_data = base64encode("ehco 'Hello World'")
+  user_data = filebase64("files/user_data.sh")
   key_name = aws_key_pair.server.key_name
 
   metadata_options {

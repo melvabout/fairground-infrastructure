@@ -17,5 +17,5 @@ dependency "network" {
 
 inputs = {
   subnet_ids = dependency.network.outputs.private_subnets_list
-  server_image_id = "ami-0dec4153255535770" # k8-server-aws-redhat-20240512115747	
+  server_image_id = "ami-0d9bca9b2b1760291" # k8-server-aws-redhat-20240516071713
 }
