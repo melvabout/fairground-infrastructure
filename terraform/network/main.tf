@@ -5,6 +5,7 @@ terraform {
 resource "aws_vpc" "this" {
 
   cidr_block = local.vpc_cidr
+  enable_dns_hostnames = true
   tags = {
     Name = "fairground"
   }
@@ -58,4 +59,92 @@ resource "aws_network_acl" "private" {
     to_port    = 0
   }
 
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  count = var.create_endpoint == "yes" ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.eu-west-2.ssm"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [ for subnet in aws_subnet.private : subnet.id ]
+  private_dns_enabled = true
+
+  security_group_ids = [
+    aws_security_group.end_point.id,
+  ]
+}
+
+resource "aws_vpc_endpoint" "ssm_messages" {
+  count = var.create_endpoint == "yes" ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.eu-west-2.ssmmessages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [ for subnet in aws_subnet.private : subnet.id ]
+  private_dns_enabled = true
+
+  security_group_ids = [
+    aws_security_group.end_point.id,
+  ]
+}
+
+resource "aws_vpc_endpoint" "ec2_messages" {
+  count = var.create_endpoint == "yes" ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.eu-west-2.ec2messages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [ for subnet in aws_subnet.private : subnet.id ]
+  private_dns_enabled = true
+
+  security_group_ids = [
+    aws_security_group.end_point.id,
+  ]
+}
+
+resource "aws_vpc_endpoint" "logs" {
+  count = var.create_endpoint == "yes" ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.eu-west-2.logs"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [ for subnet in aws_subnet.private : subnet.id ]
+  private_dns_enabled = true
+
+  security_group_ids = [
+    aws_security_group.end_point.id,
+  ]
+}
+
+resource "aws_vpc_endpoint" "ec2" {
+  count = var.create_endpoint == "yes" ? 1 : 0
+
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.eu-west-2.ec2"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [ for subnet in aws_subnet.private : subnet.id ]
+  private_dns_enabled = true
+
+  security_group_ids = [
+    aws_security_group.end_point.id,
+  ]
+}
+
+resource "aws_security_group" "end_point" {
+  name = "endpoint"
+  vpc_id = aws_vpc.this.id
+  ingress {
+    from_port = "0"
+    to_port = "0"
+    protocol = "-1"
+    cidr_blocks = toset([ for key, value in local.private_subnets : value ])
+  }
+
+  egress {
+    from_port = "0"
+    to_port = "0"
+    protocol = "-1"
+    cidr_blocks = toset([ for key, value in local.private_subnets : value ])
+  }
 }

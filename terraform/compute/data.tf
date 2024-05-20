@@ -24,3 +24,31 @@ data "aws_iam_policy_document" "server_policy" {
 
 }
 
+data "aws_iam_policy_document" "populate_hosts" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+
+}
+
+data "aws_iam_policy_document" "populate_hosts_policy" {
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ec2:DescribeInstances",
+      "ssm:SendCommand"
+      ]
+
+    resources = ["*"]
+  }
+
+}

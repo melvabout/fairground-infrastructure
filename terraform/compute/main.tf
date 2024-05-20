@@ -22,6 +22,11 @@ resource "aws_iam_role_policy_attachment" "server" {
   policy_arn = aws_iam_policy.server.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_server" {
+  role = aws_iam_role.server.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_instance_profile" "server" {
   name = "server_profile"
   role = aws_iam_role.server.name
@@ -33,6 +38,10 @@ resource "aws_launch_template" "server" {
   instance_type = "t2.micro"
   user_data = filebase64("files/user_data.sh")
   key_name = aws_key_pair.server.key_name
+  private_dns_name_options {
+    enable_resource_name_dns_a_record = true
+  }
+  
 
   metadata_options {
     http_tokens = "required"
@@ -41,7 +50,29 @@ resource "aws_launch_template" "server" {
   iam_instance_profile {
     arn = aws_iam_instance_profile.server.arn
   }
+
+  vpc_security_group_ids = [aws_security_group.fairground.id]
   
+}
+
+resource "aws_security_group" "fairground" {
+  name = "fairground"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port = "0"
+    to_port = "0"
+    protocol = "-1"
+    security_groups = [var.endpoint_security_group]
+  }
+
+  egress {
+    from_port = "0"
+    to_port = "0"
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 }
 
 resource "aws_autoscaling_group" "server" {
@@ -66,5 +97,41 @@ resource "aws_autoscaling_group" "server" {
     value               = "server"
     propagate_at_launch = true
   }
+  tag {
+    key                 = "application"
+    value               = "fairground"
+    propagate_at_launch = true
+  }
 
+}
+
+resource "aws_iam_role" "populate_hosts" {
+  name               = "populate-hosts"
+  assume_role_policy = data.aws_iam_policy_document.populate_hosts.json
+}
+
+resource "aws_iam_policy" "populate_hosts" {
+   name = "populate_hosts_policy"
+   policy = data.aws_iam_policy_document.populate_hosts_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "populate_hosts" {
+  role = aws_iam_role.populate_hosts.name
+  policy_arn = aws_iam_policy.populate_hosts.arn
+}
+
+resource "aws_iam_role_policy_attachment" "populate_hosts_execution" {
+  role = aws_iam_role.populate_hosts.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaExecute"
+}
+
+resource "aws_lambda_function" "populate_hosts" {
+   count = signum(length(var.s3_key))
+   role = aws_iam_role.populate_hosts.arn
+   function_name = "populate-hosts"
+   runtime = "python3.11"
+   s3_bucket = var.s3_bucket
+   s3_key = var.s3_key
+   handler = "handler.main"
+   timeout = 10
 }
