@@ -7,5 +7,5 @@ terraform {
 }
 
 inputs = {
-  create_endpoint = "yes"
+  create_endpoint = "no"
 }
