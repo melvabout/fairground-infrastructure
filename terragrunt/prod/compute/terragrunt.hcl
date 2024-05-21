@@ -25,6 +25,14 @@ dependency "storage" {
   }
 }
 
+dependency "monitoring" {
+  config_path = "../monitoring"
+  
+  mock_outputs = {
+    fairground_instance_aws_sns_topic_arn = "arn:aws:sns:eu-west-2:111122223333:MyTopic"
+  }
+}
+
 inputs = {
   subnet_ids = dependency.network.outputs.private_subnets_list
   server_image_id = "ami-055ebfd5334bbdd77" # k8-server-aws-redhat-20240518093442
@@ -32,4 +40,5 @@ inputs = {
   s3_key = "lambda/python/populate-hosts.zip"
   endpoint_security_group = dependency.network.outputs.end_point_aws_security_group_id
   vpc_id = dependency.network.outputs.this_aws_vpc_id
+  sns_topic_arn = dependency.monitoring.outputs.fairground_instance_aws_sns_topic_arn
 }

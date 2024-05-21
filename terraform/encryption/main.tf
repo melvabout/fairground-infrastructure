@@ -8,5 +8,5 @@ resource "aws_kms_key" "this" {
 
 resource "aws_kms_alias" "this" {
   target_key_id = aws_kms_key.this.id
-  name = "alias/fairgound-kms-key-alias" 
+  name          = "alias/fairgound-kms-key-alias"
 }

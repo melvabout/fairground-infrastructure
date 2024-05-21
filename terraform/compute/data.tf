@@ -45,8 +45,9 @@ data "aws_iam_policy_document" "populate_hosts_policy" {
 
     actions = [
       "ec2:DescribeInstances",
-      "ssm:SendCommand"
-      ]
+      "ssm:SendCommand",
+      "sns:Subscribe"
+    ]
 
     resources = ["*"]
   }

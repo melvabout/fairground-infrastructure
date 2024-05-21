@@ -6,6 +6,4 @@ terraform {
   source =  "${path_relative_from_include()}/../../terraform/${path_relative_to_include()}"
 }
 
-inputs = {
-  create_endpoint = "yes"
-}
+inputs = {}
