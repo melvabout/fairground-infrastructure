@@ -1,2 +1,5 @@
 #!/bin/bash
-python3 ~/populate_hosts.py 
+# populate /etc/hosts
+python3 /root/populate_hosts.py 
+# start the etcd cluster
+/root/start_etcd.sh

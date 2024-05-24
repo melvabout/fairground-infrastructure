@@ -35,7 +35,7 @@ dependency "monitoring" {
 
 inputs = {
   subnet_ids = dependency.network.outputs.private_subnets_list
-  server_image_id = "ami-0b5f9db37cf35e58d" # k8-server-aws-redhat-20240521141032
+  server_image_id = "ami-0216ca620abc8a06d" # k8-server-aws-redhat-20240523151243
   s3_bucket = dependency.storage.outputs.bucket_id
   s3_key = "lambda/python/populate-hosts.zip"
   endpoint_security_group = dependency.network.outputs.end_point_aws_security_group_id
