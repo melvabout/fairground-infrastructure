@@ -53,3 +53,7 @@ data "aws_iam_policy_document" "populate_hosts_policy" {
   }
 
 }
+
+data "aws_vpc" "this" {
+  id = var.vpc_id
+}

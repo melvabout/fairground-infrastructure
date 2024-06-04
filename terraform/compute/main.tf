@@ -2,53 +2,52 @@ terraform {
   backend "s3" {}
 }
 
-resource "aws_key_pair" "server" {
+resource "aws_key_pair" "fairground" {
   key_name   = "server-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCqLyC5tLgtgwzIGvaiAUeFMFcI64fOTwoAX1YuGd9cvdNzMxeUcFv1J3lobj8Ypa2s+EbtuCh+DdHsDBbu+JtGE+Tf2oG3ZPhw1HLpU+M+nBqZjQmuc53P+8W5U7EV3ZXb4/UOpiaX2n/tzzPjs5CPcprhv6tnB9p6WB5QVVjsQwdgGC16oFH8+417eaCfvDZ019bif4eFBzw94EbmyJakOiqT3Yn0zwvFkjOlD1tQ7zcIu2UxYqSzXk2O0IMjm5BU/8biIxJV5YMTMwZAHNa6hq8zt/ZJh+rnWQspbfYBp4Ju3mKu663ITvFHhfO5JoJvxI2mg3cIRXHFX9N4g5r2m1OiTZvpy/+P7evemhahH+hwP/ZlXoFnxxwavDazld+SExdPnt97+UlCHHjqSyxHJP6O6tUd4H9twoR0yhCvYioDyXEG4zxHq4SSH3RmfC/aKbdOGaaT1fkfG8Ad6hdROnXIeXvhyq8KDRQtS8bZbKjoKoa9lxKktPL11wU+2864ZNnaj+4Nroz9/wgeqBDgFoMRXw/3AFB1Q8DMYvOh9/y5j7lSDIiaoWVevQ0CKmSbAVlgB0vEbHD3fFz2gj1vfissPlA75pEHsvHNoappcs/Nt0XKY7r8iUCzEZDo0n66bUGzgH7fGWSdIM1rl1hxqtbKbyRmbcHdIn+mwA46rQ=="
 }
 
-resource "aws_iam_role" "server" {
+resource "aws_iam_role" "fairground" {
   name               = "fairground-server"
   assume_role_policy = data.aws_iam_policy_document.server.json
 }
 
-resource "aws_iam_policy" "server" {
+resource "aws_iam_policy" "fairground" {
   policy = data.aws_iam_policy_document.server_policy.json
   name   = "server_iam_policy"
 }
 
-resource "aws_iam_role_policy_attachment" "server" {
-  role       = aws_iam_role.server.name
-  policy_arn = aws_iam_policy.server.arn
+resource "aws_iam_role_policy_attachment" "fairground" {
+  role       = aws_iam_role.fairground.name
+  policy_arn = aws_iam_policy.fairground.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_server" {
-  role       = aws_iam_role.server.name
+resource "aws_iam_role_policy_attachment" "ssm_fairground" {
+  role       = aws_iam_role.fairground.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "server" {
+resource "aws_iam_instance_profile" "fairground" {
   name = "server_profile"
-  role = aws_iam_role.server.name
+  role = aws_iam_role.fairground.name
 }
 
 resource "aws_launch_template" "server" {
 
   image_id      = var.server_image_id
   instance_type = "t2.micro"
-  user_data     = filebase64("files/user_data.sh")
-  key_name      = aws_key_pair.server.key_name
+  user_data     = filebase64("files/server_user_data.sh")
+  key_name      = aws_key_pair.fairground.key_name
   private_dns_name_options {
     enable_resource_name_dns_a_record = true
   }
-
 
   metadata_options {
     http_tokens = "required"
   }
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.server.arn
+    arn = aws_iam_instance_profile.fairground.arn
   }
 
   vpc_security_group_ids = [aws_security_group.fairground.id]
@@ -60,10 +59,10 @@ resource "aws_security_group" "fairground" {
   vpc_id = var.vpc_id
 
   ingress {
-    from_port       = "0"
-    to_port         = "0"
-    protocol        = "-1"
-    security_groups = [var.endpoint_security_group]
+    from_port    = "0"
+    to_port      = "0"
+    protocol     = "-1"
+    cidr_blocks = [ data.aws_vpc.this.cidr_block ] 
   }
 
   egress {
@@ -102,6 +101,60 @@ resource "aws_autoscaling_group" "server" {
     value               = "fairground"
     propagate_at_launch = true
   }
+
+}
+
+resource "aws_autoscaling_group" "node_0" {
+depends_on = [ aws_autoscaling_group.server ]
+
+  min_size            = 1
+  max_size            = 1
+  desired_capacity    = 1
+  vpc_zone_identifier = var.subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.node_0.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "fairground-node-0"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "k8"
+    value               = "node-0"
+    propagate_at_launch = true
+  }
+  tag {
+    key                 = "application"
+    value               = "fairground"
+    propagate_at_launch = true
+  }
+
+}
+
+resource "aws_launch_template" "node_0" {
+
+  image_id      = var.node_0_image_id
+  instance_type = "t2.micro"
+  user_data     = filebase64("files/node_user_data.sh")
+  key_name      = aws_key_pair.fairground.key_name
+  private_dns_name_options {
+    enable_resource_name_dns_a_record = true
+  }
+
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.fairground.arn
+  }
+
+  vpc_security_group_ids = [aws_security_group.fairground.id]
 
 }
 

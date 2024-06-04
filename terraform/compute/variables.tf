@@ -8,6 +8,11 @@ variable "server_image_id" {
   type        = string
 }
 
+variable "node_0_image_id" {
+  description = "The node_0 image id."
+  type        = string
+}
+
 variable "s3_bucket" {
   description = "The bucket holding compute artefacts."
   type        = string

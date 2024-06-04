@@ -1,6 +1,6 @@
 # fairground-infrastructure
 
-Working through [Kubernetes the hardway](https://github.com/kelseyhightower/kubernetes-the-hard-way). Combining this repo with [fairground-machine-images](https://github.com/melvabout/fairground-machine-images) and [python-lambda-populate-hosts](https://github.com/melvabout/python-lambda-populate-hosts) you have everything up to and including [step 7](https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/docs/07-bootstrapping-etcd.md). More to follow.
+Working through [Kubernetes the hardway](https://github.com/kelseyhightower/kubernetes-the-hard-way). Combining this repo with [fairground-machine-images](https://github.com/melvabout/fairground-machine-images) and [python-lambda-populate-hosts](https://github.com/melvabout/python-lambda-populate-hosts) you have everything up to and including [step 10](https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/docs/10-configuring-kubectl.md), but just for node-0. More to follow.
 
 ## Disclaimer
 A little light (read no) testing and not really written for reusability.
