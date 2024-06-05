@@ -17,7 +17,10 @@ data "aws_iam_policy_document" "server_policy" {
   statement {
     effect = "Allow"
 
-    actions = ["ec2:DescribeInstances"]
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags"
+      ]
 
     resources = ["*"]
   }

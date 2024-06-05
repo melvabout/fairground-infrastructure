@@ -35,10 +35,10 @@ dependency "monitoring" {
 
 inputs = {
   subnet_ids = dependency.network.outputs.private_subnets_list
-  server_image_id = "ami-0766ea5d7a8f688d7" 
+  server_image_id = "ami-0b79883452797386c" 
   node_image_ids = {
-    node-0 = "ami-09577b078cd69a997" 
-    node-1 = "ami-08d837479083ce939" 
+    node-0 = "ami-00178f168c76323cf" 
+    node-1 = "ami-09d3f273bcdeefdba" 
   }
   s3_bucket = dependency.storage.outputs.bucket_id
   s3_key = "lambda/python/populate-hosts.zip"

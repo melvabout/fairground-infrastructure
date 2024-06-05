@@ -78,7 +78,7 @@ resource "aws_autoscaling_group" "server" {
   min_size            = 1
   max_size            = 1
   desired_capacity    = 1
-  vpc_zone_identifier = var.subnet_ids
+  vpc_zone_identifier = [var.subnet_ids[0]]
 
   launch_template {
     id      = aws_launch_template.server.id
@@ -112,7 +112,7 @@ resource "aws_autoscaling_group" "node" {
   min_size            = 1
   max_size            = 1
   desired_capacity    = 1
-  vpc_zone_identifier = var.subnet_ids
+  vpc_zone_identifier = [var.subnet_ids[0]]
 
   launch_template {
     id      = aws_launch_template.node[each.key].id
