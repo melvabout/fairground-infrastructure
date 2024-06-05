@@ -8,9 +8,9 @@ variable "server_image_id" {
   type        = string
 }
 
-variable "node_0_image_id" {
-  description = "The node_0 image id."
-  type        = string
+variable "node_image_ids" {
+  description = "The node image ids"
+  type        = map(string)
 }
 
 variable "s3_bucket" {

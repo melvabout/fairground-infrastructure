@@ -104,8 +104,10 @@ resource "aws_autoscaling_group" "server" {
 
 }
 
-resource "aws_autoscaling_group" "node_0" {
+resource "aws_autoscaling_group" "node" {
 depends_on = [ aws_autoscaling_group.server ]
+
+  for_each = var.node_image_ids
 
   min_size            = 1
   max_size            = 1
@@ -113,19 +115,19 @@ depends_on = [ aws_autoscaling_group.server ]
   vpc_zone_identifier = var.subnet_ids
 
   launch_template {
-    id      = aws_launch_template.node_0.id
+    id      = aws_launch_template.node[each.key].id
     version = "$Latest"
   }
 
   tag {
     key                 = "Name"
-    value               = "fairground-node-0"
+    value               = "fairground-${each.key}"
     propagate_at_launch = true
   }
 
   tag {
     key                 = "k8"
-    value               = "node-0"
+    value               = each.key
     propagate_at_launch = true
   }
   tag {
@@ -136,9 +138,11 @@ depends_on = [ aws_autoscaling_group.server ]
 
 }
 
-resource "aws_launch_template" "node_0" {
+resource "aws_launch_template" "node" {
 
-  image_id      = var.node_0_image_id
+  for_each = var.node_image_ids
+
+  image_id      = each.value
   instance_type = "t2.micro"
   user_data     = filebase64("files/node_user_data.sh")
   key_name      = aws_key_pair.fairground.key_name
