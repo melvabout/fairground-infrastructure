@@ -59,10 +59,10 @@ resource "aws_security_group" "fairground" {
   vpc_id = var.vpc_id
 
   ingress {
-    from_port    = "0"
-    to_port      = "0"
-    protocol     = "-1"
-    cidr_blocks = [ data.aws_vpc.this.cidr_block ] 
+    from_port   = "0"
+    to_port     = "0"
+    protocol    = "-1"
+    cidr_blocks = [data.aws_vpc.this.cidr_block]
   }
 
   egress {
@@ -105,7 +105,7 @@ resource "aws_autoscaling_group" "server" {
 }
 
 resource "aws_autoscaling_group" "node" {
-depends_on = [ aws_autoscaling_group.server ]
+  depends_on = [aws_autoscaling_group.server]
 
   for_each = var.node_image_ids
 
@@ -194,7 +194,7 @@ resource "aws_lambda_function" "populate_hosts" {
 }
 
 resource "aws_sns_topic_subscription" "populate_hosts" {
-  count         = signum(length(var.s3_key))
+  count     = signum(length(var.s3_key))
   topic_arn = var.sns_topic_arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.populate_hosts[0].arn

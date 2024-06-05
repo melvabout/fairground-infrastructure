@@ -35,7 +35,7 @@ dependency "monitoring" {
 
 inputs = {
   subnet_ids = dependency.network.outputs.private_subnets_list
-  server_image_id = "ami-0796bc706ffb208dc" 
+  server_image_id = "ami-0766ea5d7a8f688d7" 
   node_image_ids = {
     node-0 = "ami-09577b078cd69a997" 
     node-1 = "ami-08d837479083ce939" 
