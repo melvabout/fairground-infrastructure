@@ -8,4 +8,5 @@ terraform {
 
 inputs = {
   create_endpoint = "no"
+  internet_access = "no"
 }

@@ -3,3 +3,9 @@ variable "create_endpoint" {
   type        = string
   default     = "no"
 }
+
+variable "internet_access" {
+  description = "Set to yes if you want a internet access from the private subnet."
+  type        = string
+  default     = "no"
+}

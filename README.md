@@ -9,4 +9,5 @@ Currently not intending to use EKS. Quoting Mrs Doyle: "Maybe I like the misery.
 
 ## Known issues
 
-`populate_hosts.py` script isn't working correctly. Manual runs resolve issues provided that the added pod route on the server is removed first.
+- `populate_hosts.py` script isn't working correctly. Manual runs resolve issues provided that the added pod route on the server is removed first.
+- Failing on the smoke test to pull the pause container. Outbound traffic is in the flowlogs, but no reponse. Assumption that it is networking and not an issue with the cluster
